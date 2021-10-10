@@ -1,4 +1,68 @@
+#using <System.dll>
+#include <direct.h>
+#include <string>
+#include <conio.h>
+#include <SMObject.h>
+#include <smstructs.h>
 
+using namespace System;
+using namespace System::Diagnostics;
+using namespace System::Threading;
+
+
+int main()
+{
+	// Tele-operation
+	//Declarations + Initializations
+	SMObject PMObj(TEXT("ProcessManagement"), sizeof(ProcessManagement));
+	array<String^>^ ModuleList = gcnew array<String^>{"Laser", "Display", "Vehicle", "GPS", "Camera"};
+	array<int>^ Critical = gcnew array<int>(ModuleList->Length) { 0, 0, 0, 0, 0 };
+	array<Process^>^ ProcessList = gcnew array<Process^>(ModuleList->Length);
+
+	//SM Creation and seeking access
+	PMObj.SMCreate();
+	PMObj.SMAccess();
+
+	ProcessManagement* PMData = (ProcessManagement*)PMObj.pData;
+
+
+	for (int i = 0; i < ModuleList->Length; i++)
+	{
+		if (Process::GetProcessesByName(ModuleList[i])->Length == 0)
+		{
+			ProcessList[i] = gcnew Process;
+
+			std::string cwd("\0", FILENAME_MAX + 1);
+			std::string currDir = getcwd(&cwd[0], cwd.capacity());
+			currDir.append("\\..\\Debug");
+			String^ dirString = gcnew String(currDir.c_str());
+			ProcessList[i]->StartInfo->WorkingDirectory = dirString;
+
+			ProcessList[i]->StartInfo->FileName = ModuleList[i];
+			ProcessList[i]->Start();
+			Console::WriteLine("The process " + ModuleList[i] + ".exe started");
+		}
+	}
+
+
+
+	// Main loop
+	while (!_kbhit())
+	{
+
+		Thread::Sleep(25);
+	}
+
+	PMData->Shutdown.Status = 0xFF;
+	// Clearing and shutdown
+
+	Console::ReadKey();
+
+	return 0;
+}
+
+
+/*
 #using <System.dll>
 #include <Windows.h>
 #include <tchar.h>
@@ -26,8 +90,8 @@ TCHAR Units[10][20] = //
 	TEXT("GPS.exe"),
 	TEXT("Camera.exe"),
 	TEXT("Display.exe"),
-	TEXT("VehicleControl.exe"),
-	TEXT("Laser.exe")
+	TEXT("Laser.exe"),
+	TEXT("VehicleControl.exe")
 };
 
 int main()
@@ -81,3 +145,4 @@ void StartProcesses()
 	}
 }
 
+*/
