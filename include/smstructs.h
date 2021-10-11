@@ -45,7 +45,8 @@ struct UnitFlags
 					Vehicle : 1,			//NONCRITICAL
 					GPS : 1,				//NONCRITICAL
 					Camera : 1,				//NONCRITICAL
-					Garbage : 3;
+					PM : 1,					//CRITICAL
+					Garbage : 2;
 };
 
 union ExecFlags
@@ -59,6 +60,17 @@ struct ProcessManagement
 	ExecFlags Heartbeat;
 	ExecFlags Shutdown;
 	long int LifeCounter;
+};
+
+struct TimeStamps
+{
+	double GPSTimeStamp;
+	double IMUTimeStamp;
+	double LaserTimeStamp;
+	double VehicleTimeStamp;
+	double PMTimeStamp;
+	double DisplayTimestamp;
+	double CameraTimestamp;
 };
 
 #define NONCRITICALMASK 0xff	//0 011 0000

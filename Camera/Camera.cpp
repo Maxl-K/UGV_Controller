@@ -1,3 +1,4 @@
+#define MAX_WAIT_CYCLES 100
 #include <zmq.hpp>
 #include <Windows.h>
 
@@ -20,8 +21,24 @@ GLuint tex;
 zmq::context_t context(1);
 zmq::socket_t subscriber(context, ZMQ_SUB);
 
+// Other Initialisations and SM
+__int64 Frequency, Counter = 0;
+int WaitCounter = 0;
+SMObject PMObj(TEXT("ProcessManagement"), sizeof(ProcessManagement));
+SMObject TStamps(TEXT("TStamps"), sizeof(TimeStamps));
+TimeStamps* TSData = (TimeStamps*)TStamps.pData;
+ProcessManagement* PMData = (ProcessManagement*)PMObj.pData;
+
 int main(int argc, char** argv)
 {
+	//SM Creation and seeking access
+	//Process Management
+	PMObj.SMAccess();
+	TStamps.SMAccess();
+
+	//Part of Windows.h 
+	QueryPerformanceFrequency((LARGE_INTEGER*)&Frequency);
+
 	//Define window size
 	const int WINDOW_WIDTH = 800;
 	const int WINDOW_HEIGHT = 600;
@@ -65,6 +82,35 @@ void display()
 }
 void idle()
 {
+
+	//Heartbeats and Timestamps
+
+	TimeStamps* TSData = (TimeStamps*)TStamps.pData;
+	ProcessManagement* PMData = (ProcessManagement*)PMObj.pData;
+
+	QueryPerformanceCounter((LARGE_INTEGER*)&Counter);
+	TSData->CameraTimestamp = (double)Counter / (double)Frequency * 1000; // ms
+	Console::WriteLine("Camera time stamp    : {0,12:F3}", TSData->CameraTimestamp);
+
+	if (PMData->Heartbeat.Flags.Camera == 0) {
+		PMData->Heartbeat.Flags.Camera = 1;
+		//std::cout << "Camera: " << (int)(PMData->Heartbeat.Flags.Camera) << std::endl;
+		WaitCounter = 0;
+	}
+	else {
+		if (WaitCounter++ > MAX_WAIT_CYCLES)
+		{
+			std::cout << "PM Shutdown Requested: " << (int)(PMData->Heartbeat.Status) << std::endl;
+			PMData->Shutdown.Status = 0xFF;
+		}
+	}
+	if (PMData->Shutdown.Flags.Camera == 1)
+	{
+		//Console::ReadKey();
+		exit(0);
+	}
+
+	//End Hearbeats and Timestamps
 
 	//receive from zmq
 	zmq::message_t update;

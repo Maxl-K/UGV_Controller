@@ -1,3 +1,4 @@
+#define MAX_WAIT_CYCLES 10
 #using <System.dll>
 #include <Windows.h>
 #include <conio.h>
@@ -17,11 +18,11 @@ int main()
 	double TimeStamp;
 	__int64 Frequency, Counter;
 	int Shutdown = 0x00;
+	int WaitCounter = 0;
 
 	//Part of Windows.h 
 	QueryPerformanceFrequency((LARGE_INTEGER*)&Frequency);
 
-	PMObj.SMCreate();
 	PMObj.SMAccess();
 	ProcessManagement* PMData = (ProcessManagement*)PMObj.pData;
 
@@ -29,9 +30,22 @@ int main()
 	{
 		QueryPerformanceCounter((LARGE_INTEGER*)&Counter);
 		TimeStamp = (double)Counter / (double)Frequency * 1000; // ms
-		Console::WriteLine("Vehicle time stamp    : {0,12:F3} {1,12:X2}", TimeStamp, Shutdown);
+		Console::WriteLine("Vehicle time stamp    : {0,12:F3}", TimeStamp);
+
+		if (PMData->Heartbeat.Flags.Vehicle == 0) {
+			PMData->Heartbeat.Flags.Vehicle = 1;
+			WaitCounter = 0;
+		};
+		if (PMData->Heartbeat.Flags.Vehicle == 1) {
+
+			if (WaitCounter++ > MAX_WAIT_CYCLES)
+			{
+				PMData->Shutdown.Status = 0xFF;
+			}
+		}
+
 		Thread::Sleep(25);
-		if (PMData->Shutdown.Status)
+		if (PMData->Shutdown.Flags.Vehicle)
 			break;
 		if (_kbhit())
 			break;

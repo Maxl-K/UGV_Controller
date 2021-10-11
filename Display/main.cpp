@@ -1,4 +1,4 @@
-
+#define MAX_WAIT_CYCLES 100
 #include <iostream>
 #include <cstdlib>
 #include <cstdio>
@@ -38,6 +38,12 @@
 #include "Messages.hpp"
 #include "HUD.hpp"
 
+#include <SMObject.h>
+#include <smstructs.h>
+#using <System.dll>
+#include <Windows.h>
+#include <conio.h>
+
 void display();
 void reshape(int width, int height);
 void idle();
@@ -64,8 +70,24 @@ Vehicle * vehicle = NULL;
 double speed = 0;
 double steering = 0;
 
+// Other Initialisations and SM
+__int64 Frequency, Counter = 0;
+int WaitCounter = 0;
+SMObject PMObj(TEXT("ProcessManagement"), sizeof(ProcessManagement));
+SMObject TStamps(TEXT("TStamps"), sizeof(TimeStamps));
+TimeStamps* TSData = (TimeStamps*)TStamps.pData;
+ProcessManagement* PMData = (ProcessManagement*)PMObj.pData;
+
 //int _tmain(int argc, _TCHAR* argv[]) {
 int main(int argc, char ** argv) {
+
+	//SM Creation and seeking access
+	//Process Management
+	PMObj.SMAccess();
+	TStamps.SMAccess();
+
+	//Part of Windows.h 
+	QueryPerformanceFrequency((LARGE_INTEGER*)&Frequency);
 
 	const int WINDOW_WIDTH = 800;
 	const int WINDOW_HEIGHT = 600;
@@ -174,6 +196,35 @@ double getTime()
 }
 
 void idle() {
+
+	//Heartbeats and Timestamps
+
+	TimeStamps* TSData = (TimeStamps*)TStamps.pData;
+	ProcessManagement* PMData = (ProcessManagement*)PMObj.pData;
+
+	QueryPerformanceCounter((LARGE_INTEGER*)&Counter);
+	TSData->DisplayTimestamp = (double)Counter / (double)Frequency * 1000; // ms
+	Console::WriteLine("Display time stamp    : {0,12:F3}", TSData->DisplayTimestamp);
+
+	if (PMData->Heartbeat.Flags.Display == 0) {
+		PMData->Heartbeat.Flags.Display = 1;
+		//std::cout << "Display: " << (int)(PMData->Heartbeat.Flags.Display) << std::endl;
+		WaitCounter = 0;
+	}
+	else  {
+		if (WaitCounter++ > MAX_WAIT_CYCLES)
+		{
+			//std::cout << "PM Shutdown Requested: " << (int)(PMData->Heartbeat.Status) << std::endl;
+			PMData->Shutdown.Status = 0xFF;
+		}
+	}
+	if (PMData->Shutdown.Flags.Display == 1)
+	{
+		//Console::ReadKey();
+		exit(0);
+	}
+
+	//End Hearbeats and Timestamps
 
 	if (KeyManager::get()->isAsciiKeyPressed('a')) {
 		Camera::get()->strafeLeft();
