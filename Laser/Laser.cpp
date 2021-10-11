@@ -26,17 +26,17 @@ int main()
 	PMObj.SMAccess();
 	if (PMObj.SMAccessError) {
 		Console::WriteLine("Shared memory access failed");
-		return -1;
+		//return -1;
 	}
 	TStamps.SMAccess();
 	if (PMObj.SMAccessError) {
 		Console::WriteLine("Shared memory access failed");
-		return -1;
+		//return -1;
 	}
 	LaserObj.SMAccess();
 	if (LaserObj.SMAccessError) {
 		Console::WriteLine("Shared memory access failed");
-		return -1;
+		//return -1;
 	}
 
 	//Declaration
