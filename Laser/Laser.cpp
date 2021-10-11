@@ -4,7 +4,9 @@
 #include <conio.h>
 #include <SMObject.h>
 #include <smstructs.h>
-#define MAX_WAIT_CYCLES 10
+//#define MAX_WAIT_CYCLES 10
+//^^ for home computer
+#define MAX_WAIT_CYCLES 100
 
 using namespace System;
 using namespace System::Net::Sockets;
@@ -15,6 +17,8 @@ using namespace System::Threading;
 
 int main()
 {
+	Console::WriteLine("Process Awake");
+
 	SMObject PMObj(TEXT("ProcessManagement"), sizeof(ProcessManagement));
 	SMObject TStamps(TEXT("TStamps"), sizeof(TimeStamps));
 	SMObject LaserObj(_TEXT("Laserobj"), sizeof(SM_Laser));
@@ -46,7 +50,7 @@ int main()
 	TimeStamps* TSData = (TimeStamps*)TStamps.pData;
 	ProcessManagement* PMData = (ProcessManagement*)PMObj.pData;
 	SM_Laser* LSData = (SM_Laser*)LaserObj.pData;
-	PMData->Heartbeat.Flags.Laser = 1;
+	TSData->LaserTimeStamp = NULL;
 
 	// LMS151 port number must be 23000
 	int PortNumber = 23000;
@@ -89,10 +93,12 @@ int main()
 	ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
 	//Validate Response
 	Console::WriteLine(ResponseData);
-	Console::ReadKey();
+	//Console::ReadKey();
 
 	// Convert string command to an array of unsigned char
 	SendData = System::Text::Encoding::ASCII->GetBytes(AskScan);
+
+	Console::WriteLine("Process Awake and ready");
 
 	//Loop
 	while (!(_kbhit() || PMData->Shutdown.Flags.Laser))

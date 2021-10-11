@@ -4,7 +4,8 @@
 #include <conio.h>
 #include <SMObject.h>
 #include <smstructs.h>
-#define MAX_WAIT_CYCLES 20
+//#define MAX_WAIT_CYCLES 20
+//^^ for home computer
 #include <bitset>
 #include <typeinfo>
 
@@ -13,7 +14,7 @@ using namespace System::Diagnostics;
 using namespace System::Threading;
 
 int main()
-{	
+{
 	//Timestamp Initialisations
 	double TimeStamp;
 	__int64 Frequency, Counter;
@@ -28,10 +29,11 @@ int main()
 	//Process setup
 	SMObject PMObj(TEXT("ProcessManagement"), sizeof(ProcessManagement));
 	array<String^>^ ModuleList = gcnew array<String^>{"Laser", "Display", "Vehicle", "GPS", "Camera"};
-	array<int>^ Critical = gcnew array<int>(ModuleList->Length) { 1, 1, 1, 1, 0 };
+	array<int>^ Critical = gcnew array<int>(ModuleList->Length) { 0, 0, 0, 0, 0 };
 	array<Process^>^ ProcessList = gcnew array<Process^>(ModuleList->Length);
 
 	array<int>^ WaitCounter = gcnew array<int>(ModuleList->Length) { 0, 0, 0, 0, 0 };
+	array<int>^ MaxCounts = gcnew array<int>(ModuleList->Length) { 500, 500, 500, 500, 500 };
 
 	//Timestamp setup
 	SMObject TStamps(TEXT("TStamps"), sizeof(TimeStamps));
@@ -53,7 +55,7 @@ int main()
 	//Initialise shutdown flags
 	PMData->Shutdown.Status = 0x00;
 
-	//Initialise heartbeats flag will be pulled up by other process
+	//Initialise heartbeats flag will, be pulled up by other process
 	PMData->Heartbeat.Status = 0x00;
 
 	for (int i = 0; i < ModuleList->Length; i++)
@@ -76,16 +78,21 @@ int main()
 		TimeStamp = (double)Counter / (double)Frequency * 1000; // ms
 		TSData->PMTimeStamp = TimeStamp;
 
+		WaitCounter[0] = 0;
 		for (int i = 0; i < 5; i++)
 		{
-			if (((PMData->Heartbeat.Status)&(1 << i)) != 0)
+			if (((PMData->Heartbeat.Status) & (1 << i)) != 0)
 			{
-				PMData->Heartbeat.Status = (PMData->Heartbeat.Status)^(1 << i);
+				PMData->Heartbeat.Status = (PMData->Heartbeat.Status) ^ (1 << i);
 				WaitCounter[i] = 0;
 			}
 			else
 			{
-				if (WaitCounter[i]++ > MAX_WAIT_CYCLES)
+				if ((i == 0) && (TSData->LaserTimeStamp == NULL))
+				{
+					continue;
+				}
+				if (WaitCounter[i]++ > MaxCounts[i])
 				{
 					if (Critical[i] == 1)
 					{

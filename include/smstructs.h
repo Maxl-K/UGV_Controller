@@ -60,6 +60,7 @@ struct ProcessManagement
 	ExecFlags Heartbeat;
 	ExecFlags Shutdown;
 	long int LifeCounter;
+	bool ready;
 };
 
 struct TimeStamps

@@ -1,3 +1,5 @@
+//#define MAX_WAIT_CYCLES 100
+//^^ for home computer
 #define MAX_WAIT_CYCLES 100
 #include <zmq.hpp>
 #include <Windows.h>
@@ -31,6 +33,7 @@ ProcessManagement* PMData = (ProcessManagement*)PMObj.pData;
 
 int main(int argc, char** argv)
 {
+	Console::WriteLine("Process Awake");
 	//SM Creation and seeking access
 	//Process Management
 	PMObj.SMAccess();
@@ -82,7 +85,6 @@ void display()
 }
 void idle()
 {
-
 	//Heartbeats and Timestamps
 
 	TimeStamps* TSData = (TimeStamps*)TStamps.pData;

@@ -1,3 +1,5 @@
+//#define MAX_WAIT_CYCLES 100
+//^^ for home computer
 #define MAX_WAIT_CYCLES 100
 #include <iostream>
 #include <cstdlib>
@@ -80,6 +82,8 @@ ProcessManagement* PMData = (ProcessManagement*)PMObj.pData;
 
 //int _tmain(int argc, _TCHAR* argv[]) {
 int main(int argc, char ** argv) {
+
+	Console::WriteLine("Process Awake");
 
 	//SM Creation and seeking access
 	//Process Management

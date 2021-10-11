@@ -1,4 +1,6 @@
-#define MAX_WAIT_CYCLES 10
+//#define MAX_WAIT_CYCLES 10
+//^^ for home computer
+#define MAX_WAIT_CYCLES 100
 #using <System.dll>
 #include <Windows.h>
 #include <conio.h>
@@ -25,6 +27,8 @@ int main()
 
 	PMObj.SMAccess();
 	ProcessManagement* PMData = (ProcessManagement*)PMObj.pData;
+
+	Console::WriteLine("Process Awake");
 
 	while (1)
 	{
