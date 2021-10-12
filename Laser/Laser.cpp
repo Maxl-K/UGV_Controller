@@ -137,7 +137,7 @@ int main()
 		// Convert incoming data from an array of unsigned char bytes to an ASCII string
 		ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
 		// Print the received string on the screen
-		Console::WriteLine(ResponseData);
+		//Console::WriteLine(ResponseData);
 		Value = ResponseData->Split();
 
 		if (Value->Length < 26) {
@@ -186,8 +186,8 @@ int main()
 	Stream->Close();
 	Client->Close();
 
-	Console::WriteLine("Press any key to quit");
-	Console::ReadKey();
+	//Console::WriteLine("Press any key to quit");
+	//Console::ReadKey();
 
 	return 0;
 }
