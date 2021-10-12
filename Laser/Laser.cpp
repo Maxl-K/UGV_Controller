@@ -25,15 +25,15 @@ int main()
 
 	PMObj.SMAccess();
 	if (PMObj.SMAccessError) {
-		Console::WriteLine("Shared memory access failed");
+		Console::WriteLine("Shared memory access failed for PMObj");
 	}
 	TStamps.SMAccess();
 	if (PMObj.SMAccessError) {
-		Console::WriteLine("Shared memory access failed");
+		Console::WriteLine("Shared memory access failed for TStamps");
 	}
 	LaserObj.SMAccess();
 	if (LaserObj.SMAccessError) {
-		Console::WriteLine("Shared memory access failed");
+		Console::WriteLine("Shared memory access failed for LaserObj");
 	}
 
 	//Declaration
@@ -103,7 +103,7 @@ int main()
 		//Heartbeats and TS
 		QueryPerformanceCounter((LARGE_INTEGER*)&Counter);
 		TSData->LaserTimeStamp = (double)Counter / (double)Frequency * 1000; // ms
-		Console::WriteLine("Laser time stamp    : {0,12:F3} {1,12:X2}", TSData->LaserTimeStamp, Shutdown);
+		Console::WriteLine("Laser time stamp    : {0,12:F3}", TSData->LaserTimeStamp);
 
 		if (PMData->Heartbeat.Flags.Laser == 0) {
 			PMData->Heartbeat.Flags.Laser = 1;
@@ -140,6 +140,10 @@ int main()
 
 	Stream->Close();
 	Client->Close();
+
+	Console::WriteLine("Press any key to quit");
+	Console::ReadKey();
+	Console::ReadKey();
 
 	return 0;
 }

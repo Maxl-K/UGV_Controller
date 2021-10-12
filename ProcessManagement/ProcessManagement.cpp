@@ -26,7 +26,7 @@ int main()
 	currDir.append("\\..\\Debug");
 	String^ dirString = gcnew String(currDir.c_str());
 
-	//Process setup
+	//Process SM
 	SMObject PMObj(TEXT("ProcessManagement"), sizeof(ProcessManagement));
 	array<String^>^ ModuleList = gcnew array<String^>{"Laser", "Display", "Vehicle", "GPS", "Camera"};
 	array<int>^ Critical = gcnew array<int>(ModuleList->Length) { 0, 0, 0, 0, 0 };
@@ -35,15 +35,23 @@ int main()
 	array<int>^ WaitCounter = gcnew array<int>(ModuleList->Length) { 0, 0, 0, 0, 0 };
 	array<int>^ MaxCounts = gcnew array<int>(ModuleList->Length) { 500, 500, 500, 500, 500 };
 
-	//Timestamp setup
+	//Timestamp SM
 	SMObject TStamps(TEXT("TStamps"), sizeof(TimeStamps));
+	//Laser SM
+	SMObject LaserObj(_TEXT("Laserobj"), sizeof(SM_Laser));
 
 	//SM Creation and seeking access
 	PMObj.SMCreate();
 	PMObj.SMAccess();
 	TStamps.SMCreate();
 	TStamps.SMAccess();
-	if (PMObj.SMCreateError || TStamps.SMAccessError) {
+	LaserObj.SMCreate();
+	LaserObj.SMAccess();
+	bool error = FALSE;
+	error = error || (PMObj.SMCreateError || PMObj.SMAccessError);
+	error = error || (TStamps.SMCreateError || TStamps.SMAccessError);
+	error = error || (LaserObj.SMCreateError || LaserObj.SMAccessError);
+	if (error) {
 		Console::WriteLine("Shared memory creation failed. Terminating.");
 		return -1;
 	}
