@@ -168,8 +168,8 @@ int main()
 		LSData->PointCloudSize = PointCloudSize;
 		for (int i = 0; i < PointCloudSize; i++) {
 			Range[i] = System::Convert::ToInt32(Value[26 + i], 16);
-			X[i] = (Range[i] * Math::Sin(i * Resolution * Math::PI / 180.0)) / 1000.0;
-			Y[i] = (-Range[i] * Math::Cos(i * Resolution * Math::PI / 180.0)) / 1000.0;
+			X[i] = (Range[i] * Math::Sin(i * Resolution * Math::PI / 180.0));
+			Y[i] = (-Range[i] * Math::Cos(i * Resolution * Math::PI / 180.0));
 			Console::WriteLine("Point " + i + " X: " + X[i] + "  Y: " + Y[i]);
 			LSData->x[i] = X[i];
 			LSData->y[i] = Y[i];
