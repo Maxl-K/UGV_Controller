@@ -150,7 +150,7 @@ int main()
 		}
 		//angle = System::Text::Encoding::ASCII->GetString(*(unsigned char)Value[23]);
 		Angle = System::Convert::ToInt32(Value[23], 16);
-		Resolution = System::Convert::ToInt32(Value[24], 16);
+		Resolution = System::Convert::ToInt32(Value[24], 16) / 10000;
 		PointCloudSize = System::Convert::ToInt32(Value[25], 16);
 
 		Range = gcnew array<double>(PointCloudSize);
@@ -162,10 +162,9 @@ int main()
 		}
 
 		std::cout << "Starting angle: " << Angle << std::endl;
-		std::cout << "Resolution: " << Resolution / 10000 << std::endl;
+		std::cout << "Resolution: " << Resolution << std::endl;
 		std::cout << "Number of points: " << PointCloudSize << std::endl;
 		
-		Resolution = Resolution / 10000;
 		LSData->PointCloudSize = PointCloudSize;
 		for (int i = 0; i < PointCloudSize; i++) {
 			Range[i] = System::Convert::ToInt32(Value[26 + i], 16);
