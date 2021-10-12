@@ -76,10 +76,19 @@ int main()
 	System::String^ Zid = gcnew System::String("5265207\n");
 	SendData = gcnew array<unsigned char>(16);
 	ReadData = gcnew array<unsigned char>(2500);
+	//array<String^>^ Value = gcnew array<String^>(1082*2);
+	array<String^>^ Value;
+	array<double>^ Range;
+	array<double>^ X;
+	array<double>^ Y;
+	double Angle, Resolution;
+	int PointCloudSize;
 
 	// Get the network streab object associated with clien so we 
 	// can use it to read and write
 	NetworkStream^ Stream = Client->GetStream();
+
+	PMData->Heartbeat.Flags.Laser = 1;
 
 	//Authentication
 	SendData = System::Text::Encoding::ASCII->GetBytes(Zid);
@@ -89,13 +98,13 @@ int main()
 	Stream->Read(ReadData, 0, ReadData->Length);
 	ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
 	//Validate Response
-	Console::WriteLine(ResponseData);
-	//Console::ReadKey();
+	if (ResponseData != "OK") {
+		//Error?
+		Console::WriteLine("Authentication failed. Response Value: " + ResponseData);
+	}
 
 	// Convert string command to an array of unsigned char
 	SendData = System::Text::Encoding::ASCII->GetBytes(AskScan);
-
-	Console::WriteLine("Process Awake and ready");
 
 	//Loop
 	while (!(_kbhit() || PMData->Shutdown.Flags.Laser))
@@ -129,6 +138,43 @@ int main()
 		ResponseData = System::Text::Encoding::ASCII->GetString(ReadData);
 		// Print the received string on the screen
 		Console::WriteLine(ResponseData);
+		Value = ResponseData->Split();
+
+		if (Value->Length < 26) {
+			Console::WriteLine("Not enough data. Length recieved: " + Value->Length);
+			continue;
+		}
+		if (Value[1] != "LMDscandata") {
+			Console::WriteLine("Unexpected header. Header recieved: " + Value[1]);
+			continue;
+		}
+		//angle = System::Text::Encoding::ASCII->GetString(*(unsigned char)Value[23]);
+		Angle = System::Convert::ToInt32(Value[23], 16);
+		Resolution = System::Convert::ToInt32(Value[24], 16);
+		PointCloudSize = System::Convert::ToInt32(Value[25], 16);
+
+		Range = gcnew array<double>(PointCloudSize);
+		X = gcnew array<double>(PointCloudSize);
+		Y = gcnew array<double>(PointCloudSize);
+
+		if (Value->Length < 26 + PointCloudSize) {
+			continue;
+		}
+
+		std::cout << "Starting angle: " << Angle << std::endl;
+		std::cout << "Resolution: " << Resolution / 10000 << std::endl;
+		std::cout << "Number of points: " << PointCloudSize << std::endl;
+		
+		Resolution = Resolution / 10000;
+		LSData->PointCloudSize = PointCloudSize;
+		for (int i = 0; i < PointCloudSize; i++) {
+			Range[i] = System::Convert::ToInt32(Value[26 + i], 16);
+			X[i] = (Range[i] * Math::Sin(i * Resolution * Math::PI / 180.0)) / 1000.0;
+			Y[i] = (-Range[i] * Math::Cos(i * Resolution * Math::PI / 180.0)) / 1000.0;
+			Console::WriteLine("Point " + i + " X: " + X[i] + "  Y: " + Y[i]);
+			LSData->x[i] = X[i];
+			LSData->y[i] = Y[i];
+		}
 
 		Thread::Sleep(25);
 		if (PMData->Shutdown.Flags.Laser)
@@ -142,7 +188,6 @@ int main()
 	Client->Close();
 
 	Console::WriteLine("Press any key to quit");
-	Console::ReadKey();
 	Console::ReadKey();
 
 	return 0;

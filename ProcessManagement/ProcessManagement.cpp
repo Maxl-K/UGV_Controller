@@ -55,6 +55,7 @@ int main()
 		Console::WriteLine("Shared memory creation failed. Terminating.");
 		return -1;
 	}
+	//Sufficient Error handling
 
 	//Casting pointers
 	ProcessManagement* PMData = (ProcessManagement*)PMObj.pData;
