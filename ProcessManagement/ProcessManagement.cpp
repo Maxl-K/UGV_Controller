@@ -39,6 +39,10 @@ int main()
 	SMObject TStamps(TEXT("TStamps"), sizeof(TimeStamps));
 	//Laser SM
 	SMObject LaserObj(_TEXT("Laserobj"), sizeof(SM_Laser));
+	//Vehicle SM
+	SMObject VehicleObj(_TEXT("VehicleObj"), sizeof(SM_VehicleControl));
+	//GPS SM
+	SMObject GPSObj(_TEXT("GPSObj"), sizeof(SM_GPS));
 
 	//SM Creation and seeking access
 	PMObj.SMCreate();
@@ -47,10 +51,17 @@ int main()
 	TStamps.SMAccess();
 	LaserObj.SMCreate();
 	LaserObj.SMAccess();
+	VehicleObj.SMCreate();
+	VehicleObj.SMAccess();
+	GPSObj.SMCreate();
+	GPSObj.SMAccess();
+
 	bool error = FALSE;
 	error = error || (PMObj.SMCreateError || PMObj.SMAccessError);
 	error = error || (TStamps.SMCreateError || TStamps.SMAccessError);
 	error = error || (LaserObj.SMCreateError || LaserObj.SMAccessError);
+	error = error || (VehicleObj.SMCreateError || VehicleObj.SMAccessError);
+	error = error || (GPSObj.SMCreateError || GPSObj.SMAccessError);
 	if (error) {
 		Console::WriteLine("Shared memory creation failed. Terminating.");
 		return -1;
