@@ -96,8 +96,8 @@ int Laser::sendDataToSharedMemory()
 	double Angle, Resolution;
 	int PointCloudSize;
 
-	Angle = System::Convert::ToInt32(Value[23], 16);
-	Resolution = System::Convert::ToInt32(Value[24], 16) / 10000;
+	Angle = System::Convert::ToInt32(Value[23], 16.0);
+	Resolution = System::Convert::ToInt32(Value[24], 16) / 10000.0;
 	PointCloudSize = System::Convert::ToInt32(Value[25], 16);
 
 	Range = gcnew array<double>(PointCloudSize);
