@@ -11,9 +11,17 @@ int GPS::setupSharedMemory()
 	ProcessManagementData = new SMObject(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
 	while(ProcessManagementData->SMAccess());
 	if (ProcessManagementData->SMAccessError) {
-		Console::WriteLine("Shared memory access failed for PMObj");
+		Console::WriteLine("Shared memory access failed for PM");
 	}
 	PMData = (ProcessManagement*)ProcessManagementData->pData;
+
+	ProcessManagementData = new SMObject(_TEXT("GPS"), sizeof(SM_GPS));
+	while (ProcessManagementData->SMAccess());
+	if (ProcessManagementData->SMAccessError) {
+		Console::WriteLine("Shared memory access failed for GPS");
+	}
+	GPSData = (SM_GPS*)ProcessManagementData->pData;
+
 	return ERROR;
 }
 int GPS::getData()

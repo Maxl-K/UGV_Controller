@@ -20,7 +20,6 @@ int main()
 	Laser laser;
 	laser.setupSharedMemory();
 	Console::WriteLine("Shared memory created successfully.");
-	Console::WriteLine("Attempting to connect to LIDAR scanner.");
 	laser.connect(laser.Ip, laser.PortNumber);
 
 	while (!(_kbhit() || laser.getShutdownFlag()))

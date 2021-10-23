@@ -7,6 +7,7 @@ int Laser::connect(String^ hostName, int portNumber)
 	ReadData = gcnew array<unsigned char>(2500);
 	// Creat TcpClient object and connect to it
 	try {
+		Console::WriteLine("Attempting to connect to LIDAR scanner.");
 		Client = gcnew TcpClient(hostName, portNumber);
 		Console::WriteLine("Connection to scanner successful.");
 	}
