@@ -3,12 +3,7 @@
 #include <smstructs.h>
 #include <Windows.h>
 
-#define CRC32_POLYNOMIAL 0xEDB88320L
-
-unsigned long CRC32Value(int i);
-unsigned long CalculateBlockCRC32(unsigned long ulCount, unsigned char* ucBuffer);
-
-ref class GPS : public UGV_module
+ref class Vehicle : public UGV_module
 {
 
 public:
@@ -19,7 +14,7 @@ public:
 	int sendDataToSharedMemory() override;
 	bool getShutdownFlag() override;
 	int setHeartbeat(int maxWaitCycles) override;
-	~GPS();
+	~Vehicle();
 
 protected:
 	// YOUR CODE HERE (ADDITIONAL MEMBER VARIABLES THAT YOU MAY WANT TO ADD)

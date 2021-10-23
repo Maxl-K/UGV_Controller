@@ -1,4 +1,5 @@
 #include "GPS.h"
+#include <Windows.h>
 
 int GPS::connect(String^ hostName, int portNumber)
 {
@@ -7,8 +8,13 @@ int GPS::connect(String^ hostName, int portNumber)
 }
 int GPS::setupSharedMemory()
 {
-	// YOUR CODE HERE
-	return 1;
+	ProcessManagementData = new SMObject(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
+	while(ProcessManagementData->SMAccess());
+	if (ProcessManagementData->SMAccessError) {
+		Console::WriteLine("Shared memory access failed for PMObj");
+	}
+	PMData = (ProcessManagement*)ProcessManagementData->pData;
+	return ERROR;
 }
 int GPS::getData()
 {
@@ -27,14 +33,33 @@ int GPS::sendDataToSharedMemory()
 }
 bool GPS::getShutdownFlag()
 {
-	// YOUR CODE HERE
-	return 1;
+	bool shutdown = FALSE;
+	try {
+		if (PMData->Shutdown.Flags.GPS == 1) {
+			shutdown = TRUE;
+		}
+	}
+	catch (Exception^) {
+		Console::WriteLine("Failed");
+	}
+	return shutdown;
 }
-int GPS::setHeartbeat(bool heartbeat)
+int GPS::setHeartbeat(int maxWaitCycles)
 {
-	// YOUR CODE HERE
+	if (PMData->Heartbeat.Flags.GPS == 0) {
+		PMData->Heartbeat.Flags.GPS = 1;
+		WaitCounter = 0;
+	};
+	if (PMData->Heartbeat.Flags.GPS == 1) {
+
+		if (WaitCounter++ > maxWaitCycles)
+		{
+			PMData->Shutdown.Status = 0xFF;
+		}
+	}
 	return 1;
 }
+
 GPS::~GPS()
 {
 	// YOUR CODE HERE
