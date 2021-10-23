@@ -78,7 +78,7 @@ int main()
 
 	for (int i = 0; i < ModuleList->Length; i++)
 	{
-		if (Process::GetProcessesByName(ModuleList[i])->Length == 0)
+		if (TRUE) //Process::GetProcessesByName(ModuleList[i])->Length == 0
 		{
 			ProcessList[i] = gcnew Process;
 			ProcessList[i]->StartInfo->WorkingDirectory = dirString;

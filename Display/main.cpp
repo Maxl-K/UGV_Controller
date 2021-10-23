@@ -176,8 +176,8 @@ void display() {
 	for (int i = 0; i < 361; i++) {
 		double x = vehicle->getX(), y = vehicle->getY(), z = vehicle->getZ();
 		glBegin(GL_LINES);
-		glVertex3f(0, 0, 0);
-		glVertex3f(LData->y[i] / 1000, 0, -LData->x[i] / 1000);
+		glVertex3f(LData->x[i] / 1000, 0, -LData->y[i] / 1000);
+		glVertex3f(LData->x[i] / 1000, 0.3, -LData->y[i] / 1000);
 		glEnd();
 	}
 
