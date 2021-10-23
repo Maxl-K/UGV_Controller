@@ -165,6 +165,21 @@ void display() {
 
 	}
 
+	SMObject LaserObj(_TEXT("Laserobj"), sizeof(SM_Laser));
+	while (LaserObj.SMAccess());
+	if (LaserObj.SMAccessError) {
+		Console::WriteLine("Shared memory access failed for Laser");
+	}
+	SM_Laser* LData = (SM_Laser*)LaserObj.pData;
+	vehicle->positionInGL();
+	glTranslated(0.5, 0, 0);
+	for (int i = 0; i < 361; i++) {
+		double x = vehicle->getX(), y = vehicle->getY(), z = vehicle->getZ();
+		glBegin(GL_LINES);
+		glVertex3f(0, 0, 0);
+		glVertex3f(LData->y[i] / 1000, 0, -LData->x[i] / 1000);
+		glEnd();
+	}
 
 	// draw HUD
 	HUD::Draw();

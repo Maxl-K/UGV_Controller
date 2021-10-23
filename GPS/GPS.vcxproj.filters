@@ -23,7 +23,7 @@
     <ClCompile Include="GPS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="GPSMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SMObject.cpp">

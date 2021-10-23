@@ -4,8 +4,6 @@
 #include <conio.h>
 #include <SMObject.h>
 #include <smstructs.h>
-//#define MAX_WAIT_CYCLES 20
-//^^ for home computer
 #include <bitset>
 #include <typeinfo>
 
@@ -33,7 +31,7 @@ int main()
 	array<Process^>^ ProcessList = gcnew array<Process^>(ModuleList->Length);
 
 	array<int>^ WaitCounter = gcnew array<int>(ModuleList->Length) { 0, 0, 0, 0, 0 };
-	array<int>^ MaxCounts = gcnew array<int>(ModuleList->Length) { 500, 500, 500, 500, 500 };
+	array<int>^ MaxCounts = gcnew array<int>(ModuleList->Length) { 100, 100, 100, 100, 100 };
 
 	//Timestamp SM
 	SMObject TStamps(TEXT("TStamps"), sizeof(TimeStamps));

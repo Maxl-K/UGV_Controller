@@ -37,7 +37,7 @@ ref class UGV_module
 		virtual int checkData() = 0;								// Check Data is correct (eg headers)
 		virtual int sendDataToSharedMemory() = 0;					// Save Data in shared memory structures
 		virtual bool getShutdownFlag() = 0;							// Get Shutdown signal for module, from Process Management SM
-		virtual int setHeartbeat(bool heartbeat) = 0;				// Update heartbeat signal for module
+		virtual int setHeartbeat(int maxWaitCycles) = 0;				// Update heartbeat signal for module
 
 		void getError()
 		{

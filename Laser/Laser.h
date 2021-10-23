@@ -3,12 +3,7 @@
 #include <smstructs.h>
 #include <Windows.h>
 
-#define CRC32_POLYNOMIAL 0xEDB88320L
-
-unsigned long CRC32Value(int i);
-unsigned long CalculateBlockCRC32(unsigned long ulCount, unsigned char* ucBuffer);
-
-ref class GPS : public UGV_module
+ref class Laser : public UGV_module
 {
 
 public:
@@ -19,10 +14,21 @@ public:
 	int sendDataToSharedMemory() override;
 	bool getShutdownFlag() override;
 	int setHeartbeat(int maxWaitCycles) override;
-	~GPS();
+	~Laser();
+	int PortNumber = 23000;
+	System::String^ Ip = gcnew System::String("192.168.1.200");
 
 protected:
 	// YOUR CODE HERE (ADDITIONAL MEMBER VARIABLES THAT YOU MAY WANT TO ADD)
 	int WaitCounter = 0;
 	ProcessManagement* PMData = nullptr;
+	SM_Laser* LaserData = nullptr;
+	TcpClient^ Client = nullptr;
+	String^ AskScan = gcnew String("sRN LMDscandata");
+	String^ ResponseData;
+	array<unsigned char>^ SendData;
+	array<unsigned char>^ ReadData;
+	NetworkStream^ Stream = nullptr;
+
+	array<String^>^ Value = nullptr;
 };
