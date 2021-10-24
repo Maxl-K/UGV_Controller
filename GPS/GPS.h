@@ -28,4 +28,11 @@ protected:
 	int WaitCounter = 0;
 	ProcessManagement* PMData = nullptr;
 	SM_GPS* GPSData = nullptr;
+	TcpClient^ Client;
+	array<unsigned char>^ SendData;
+	array<unsigned char>^ ReadData;
+	NetworkStream^ Stream;
+	SM_GPS* GPSDataStruct = nullptr;
+	unsigned char* BytePtr = nullptr;
+	unsigned long* data_length = nullptr;
 };

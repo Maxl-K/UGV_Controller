@@ -13,6 +13,7 @@ int Laser::connect(String^ hostName, int portNumber)
 	}
 	catch (Exception^) {
 		Console::WriteLine("Connection to scanner unsuccessful. Connection timeout.");
+		return ERROR;
 	}
 	// Configure connection
 	Client->NoDelay = true;
@@ -36,6 +37,7 @@ int Laser::connect(String^ hostName, int portNumber)
 	if (ResponseData != "OK") {
 		//Error?
 		Console::WriteLine("Authentication failed. Response Value: " + ResponseData);
+		//return ERR_INVALID_DATA;
 	}
 	return SUCCESS;
 }
@@ -45,6 +47,7 @@ int Laser::setupSharedMemory()
 	while (ProcessManagementData->SMAccess());
 	if (ProcessManagementData->SMAccessError) {
 		Console::WriteLine("Shared memory access failed for Vehicle");
+		return ERROR;
 	}
 	PMData = (ProcessManagement*)ProcessManagementData->pData;
 
@@ -52,10 +55,11 @@ int Laser::setupSharedMemory()
 	while (ProcessManagementData->SMAccess());
 	if (ProcessManagementData->SMAccessError) {
 		Console::WriteLine("Shared memory access failed for Vehicle");
+		return ERROR;
 	}
 	LaserData = (SM_Laser*)ProcessManagementData->pData;
-
-	return ERROR;
+	Console::WriteLine("Shared memory created successfully.");
+	return SUCCESS;
 }
 int Laser::getData()
 {

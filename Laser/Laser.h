@@ -29,6 +29,5 @@ protected:
 	array<unsigned char>^ SendData;
 	array<unsigned char>^ ReadData;
 	NetworkStream^ Stream = nullptr;
-
 	array<String^>^ Value = nullptr;
 };

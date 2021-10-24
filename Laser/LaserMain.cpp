@@ -18,9 +18,13 @@ int main()
 	Console::WriteLine("Process awake.");
 
 	Laser laser;
-	laser.setupSharedMemory();
-	Console::WriteLine("Shared memory created successfully.");
-	laser.connect(laser.Ip, laser.PortNumber);
+	while(laser.setupSharedMemory());
+	while (laser.connect(laser.Ip, laser.PortNumber) == ERROR) {
+		if (laser.getShutdownFlag())
+		{
+			break;
+		}
+	}
 
 	while (!(_kbhit() || laser.getShutdownFlag()))
 	{

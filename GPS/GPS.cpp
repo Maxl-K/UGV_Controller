@@ -3,8 +3,27 @@
 
 int GPS::connect(String^ hostName, int portNumber)
 {
-	// YOUR CODE HERE
-	return 1;
+	SendData = gcnew array<unsigned char>(16);
+	ReadData = gcnew array<unsigned char>(2500);
+
+	try {
+		Console::WriteLine("Attempting to connect to GPS.");
+		Client = gcnew TcpClient(hostName, portNumber);
+		Console::WriteLine("Connection to scanner successful.");
+	}
+	catch (Exception^) {
+		Console::WriteLine("Connection to GPS unsuccessful. Connection timeout.");
+		return ERROR;
+	}
+
+	Client->NoDelay = true;
+	Client->ReceiveTimeout = 500;//ms
+	Client->SendTimeout = 500;//ms
+	Client->ReceiveBufferSize = 1024;
+	Client->SendBufferSize = 1024;
+
+	Stream = Client->GetStream();
+	return SUCCESS;
 }
 int GPS::setupSharedMemory()
 {
@@ -12,32 +31,59 @@ int GPS::setupSharedMemory()
 	while(ProcessManagementData->SMAccess());
 	if (ProcessManagementData->SMAccessError) {
 		Console::WriteLine("Shared memory access failed for PM");
+		return ERROR;
 	}
 	PMData = (ProcessManagement*)ProcessManagementData->pData;
-
-	ProcessManagementData = new SMObject(_TEXT("GPS"), sizeof(SM_GPS));
+	ProcessManagementData = new SMObject(_TEXT("GPSObj"), sizeof(SM_GPS));
 	while (ProcessManagementData->SMAccess());
 	if (ProcessManagementData->SMAccessError) {
 		Console::WriteLine("Shared memory access failed for GPS");
+		return ERROR;
 	}
 	GPSData = (SM_GPS*)ProcessManagementData->pData;
-
-	return ERROR;
+	Console::WriteLine("Shared memory created successfully.");
+	return SUCCESS;
 }
 int GPS::getData()
 {
-	// YOUR CODE HERE
-	return 1;
+	unsigned long data_length_;
+	if (Stream->DataAvailable) {
+		data_length_ = Stream->Read(ReadData, 0, ReadData->Length);
+		data_length = (unsigned long*)data_length_;
+
+		BytePtr = (unsigned char*)(GPSDataStruct);
+		for (int i = 0; i < sizeof(SM_GPS); i++) {
+			BytePtr[i] = ReadData[i];
+		}
+		std::cout << std::hex << "GPS data received with CRC " << GPSDataStruct->Checksum << std::endl;
+	}
+
+	return SUCCESS;
 }
 int GPS::checkData()
 {
-	// YOUR CODE HERE
-	return 1;
+	unsigned long Calculated_CRC = CalculateBlockCRC32(*data_length - 4, BytePtr);
+	unsigned int Expected_CRC = GPSDataStruct->Checksum;
+	if (Expected_CRC == Calculated_CRC && *(BytePtr) == 0xAA) {
+		return SUCCESS;
+	}
+	else {
+		Console::WriteLine("Invalid Data recieved. Header: ", *(BytePtr), " Expected: 0xAA", " Calculated CRC: ", Calculated_CRC, " Expected: ", Expected_CRC);
+		return ERR_INVALID_DATA;
+	}
+	return SUCCESS;
 }
 int GPS::sendDataToSharedMemory()
 {
-	// YOUR CODE HERE
-	return 1;
+	GPSData->Northing = GPSDataStruct->Northing;
+	GPSData->Easting = GPSDataStruct->Easting;
+	GPSData->Height = GPSDataStruct->Height;
+	GPSData->Checksum = GPSDataStruct->Checksum;
+	std::cout << "Northing: " << GPSData->Northing << std::endl;
+	std::cout << "Easting: " << GPSData->Easting << std::endl;
+	std::cout << "Height: " << GPSData->Height << std::endl;
+	Console::WriteLine();
+	return SUCCESS;
 }
 bool GPS::getShutdownFlag()
 {
@@ -70,7 +116,8 @@ int GPS::setHeartbeat(int maxWaitCycles)
 
 GPS::~GPS()
 {
-	// YOUR CODE HERE
+	Stream->Close();
+	Client->Close();
 }
 
 unsigned long CRC32Value(int i)

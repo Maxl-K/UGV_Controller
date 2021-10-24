@@ -31,7 +31,7 @@ int main()
 	array<Process^>^ ProcessList = gcnew array<Process^>(ModuleList->Length);
 
 	array<int>^ WaitCounter = gcnew array<int>(ModuleList->Length) { 0, 0, 0, 0, 0 };
-	array<int>^ MaxCounts = gcnew array<int>(ModuleList->Length) { 100, 100, 100, 100, 100 };
+	array<int>^ MaxCounts = gcnew array<int>(ModuleList->Length) { 500, 100, 100, 500, 100 };
 
 	//Timestamp SM
 	SMObject TStamps(TEXT("TStamps"), sizeof(TimeStamps));
@@ -96,7 +96,7 @@ int main()
 		TimeStamp = (double)Counter / (double)Frequency * 1000; // ms
 		TSData->PMTimeStamp = TimeStamp;
 
-		WaitCounter[0] = 0;
+		//WaitCounter[0] = 0;
 		for (int i = 0; i < 5; i++)
 		{
 			if (((PMData->Heartbeat.Status) & (1 << i)) != 0)
@@ -106,10 +106,10 @@ int main()
 			}
 			else
 			{
-				if ((i == 0) && (TSData->LaserTimeStamp == NULL))
-				{
-					continue;
-				}
+				//if ((i == 0) && (TSData->LaserTimeStamp == NULL))
+				//{
+				//	continue;
+				//}
 				if (WaitCounter[i]++ > MaxCounts[i])
 				{
 					if (Critical[i] == 1)
