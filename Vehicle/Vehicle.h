@@ -20,4 +20,5 @@ protected:
 	// YOUR CODE HERE (ADDITIONAL MEMBER VARIABLES THAT YOU MAY WANT TO ADD)
 	int WaitCounter = 0;
 	ProcessManagement* PMData = nullptr;
+	SM_VehicleControl* VehicleData = nullptr;
 };

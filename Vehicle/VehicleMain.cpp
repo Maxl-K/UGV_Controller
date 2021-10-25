@@ -17,9 +17,10 @@ int main()
 	Vehicle vehicle;
 	vehicle.setupSharedMemory();
 	Console::WriteLine("Process Awake");
-	while (!(_kbhit() || vehicle.getShutdownFlag()))
+	while (!vehicle.getShutdownFlag())
 	{
 		vehicle.setHeartbeat(MAX_WAIT_CYCLES);
+		vehicle.getData();
 		Thread::Sleep(25);
 	}
 

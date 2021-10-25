@@ -152,5 +152,10 @@ void HUD::Draw()
 		DrawGauge(600+winWidthOff, 280, 210, -40, 40, vehicle->getSteering(), "Steer");
 	}
 
+	//char buffer[16];
+	//double a = 3.1415;
+	//sprintf(buffer, "%.1f", a);
+	//RenderString(buffer, 0, 0, GLUT_BITMAP_HELVETICA_18);
+
 	Camera::get()->switchTo3DDrawing();
 }

@@ -32,16 +32,18 @@ struct SM_VehicleControl
 	double Steering;
 };
 
-struct SM_GPS//112 bytes
+#pragma pack(1)
+struct SM_GPS
 {
 	unsigned int Header;
-	unsigned char Discards1[40];
+	unsigned char garbage[40];
 	double Northing;
 	double Easting;
 	double Height;
-	unsigned char Discards2[40];
+	unsigned char garbage2[40];
 	unsigned int Checksum;
 };
+#pragma pack()
 
 struct UnitFlags
 {

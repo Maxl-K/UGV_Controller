@@ -9,18 +9,28 @@ int Vehicle::connect(String^ hostName, int portNumber)
 int Vehicle::setupSharedMemory()
 {
 	ProcessManagementData = new SMObject(_TEXT("ProcessManagement"), sizeof(ProcessManagement));
-	ProcessManagementData->SMCreate();
 	while (ProcessManagementData->SMAccess());
 	if (ProcessManagementData->SMAccessError) {
 		Console::WriteLine("Shared memory access failed for Vehicle");
+		return ERROR;
 	}
 	PMData = (ProcessManagement*)ProcessManagementData->pData;
-	return ERROR;
+
+	ProcessManagementData = new SMObject (_TEXT("VehicleObj"), sizeof(SM_VehicleControl));
+	while (ProcessManagementData->SMAccess());
+	if (ProcessManagementData->SMAccessError) {
+		Console::WriteLine("Shared memory access failed for Vehicle");
+		return ERROR;
+	}
+	VehicleData = (SM_VehicleControl*)ProcessManagementData->pData;
+	return SUCCESS;
 }
 int Vehicle::getData()
 {
-	// YOUR CODE HERE
-	return 1;
+	double spd = VehicleData->Speed;
+	double str = VehicleData->Steering;
+	std::cout << "Speed: " << spd << " Steering: " << str << std::endl;
+	return SUCCESS;
 }
 int Vehicle::checkData()
 {

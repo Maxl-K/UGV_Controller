@@ -77,6 +77,8 @@ __int64 Frequency, Counter = 0;
 int WaitCounter = 0;
 SMObject PMObj(TEXT("ProcessManagement"), sizeof(ProcessManagement));
 SMObject TStamps(TEXT("TStamps"), sizeof(TimeStamps));
+SMObject VehicleObj(_TEXT("VehicleObj"), sizeof(SM_VehicleControl));
+SM_VehicleControl* VehicleData = (SM_VehicleControl*)VehicleObj.pData;
 TimeStamps* TSData = (TimeStamps*)TStamps.pData;
 ProcessManagement* PMData = (ProcessManagement*)PMObj.pData;
 
@@ -87,8 +89,18 @@ int main(int argc, char ** argv) {
 
 	//SM Creation and seeking access
 	//Process Management
-	PMObj.SMAccess();
-	TStamps.SMAccess();
+	while (PMObj.SMAccess());
+	while (TStamps.SMAccess());
+	while (VehicleObj.SMAccess());
+
+	bool error = FALSE;
+	error = error || (PMObj.SMAccessError);
+	error = error || (TStamps.SMAccessError);
+	error = error || (VehicleObj.SMAccessError);
+	if (error) {
+		Console::WriteLine("Shared memory access failed.");
+		return -1;
+	}
 
 	//Part of Windows.h 
 	QueryPerformanceFrequency((LARGE_INTEGER*)&Frequency);
@@ -180,6 +192,8 @@ void display() {
 		glVertex3f(LData->x[i] / 1000, 0.3, -LData->y[i] / 1000);
 		glEnd();
 	}
+
+	// Display GPS Data?
 
 	// draw HUD
 	HUD::Draw();
@@ -288,8 +302,7 @@ void idle() {
 		speed = Vehicle::MAX_BACKWARD_SPEED_MPS;
 	}
 
-
-
+	SM_VehicleControl* VehicleData = (SM_VehicleControl*)VehicleObj.pData;
 
 	const float sleep_time_between_frames_in_seconds = 0.025;
 
@@ -301,6 +314,8 @@ void idle() {
 	// do a simulation step
 	if (vehicle != NULL) {
 		vehicle->update(speed, steering, elapsedTime);
+		VehicleData->Speed = speed;
+		VehicleData->Steering = steering;
 	}
 
 	display();

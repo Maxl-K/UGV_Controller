@@ -106,12 +106,9 @@ int main()
 			}
 			else
 			{
-				//if ((i == 0) && (TSData->LaserTimeStamp == NULL))
-				//{
-				//	continue;
-				//}
 				if (WaitCounter[i]++ > MaxCounts[i])
 				{
+					Console::WriteLine("Wait Count for " + ModuleList[i] + ": " + WaitCounter[i]);
 					if (Critical[i] == 1)
 					{
 						//shutdown all

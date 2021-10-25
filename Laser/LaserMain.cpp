@@ -19,12 +19,7 @@ int main()
 
 	Laser laser;
 	while(laser.setupSharedMemory());
-	while (laser.connect(laser.Ip, laser.PortNumber) == ERROR) {
-		if (laser.getShutdownFlag())
-		{
-			break;
-		}
-	}
+	while (laser.connect(laser.Ip, laser.PortNumber));
 
 	while (!(_kbhit() || laser.getShutdownFlag()))
 	{
