@@ -82,12 +82,16 @@ int Laser::getData()
 }
 int Laser::checkData()
 {
-	if (Value->Length < 26) {
+	if (Value->Length <= 26 + 361) {
 		Console::WriteLine("Not enough data. Length recieved: " + Value->Length);
 		return ERR_INVALID_DATA;
 	}
 	if (Value[1] != "LMDscandata") {
 		Console::WriteLine("Unexpected header. Header recieved: " + Value[1]);
+		return ERR_INVALID_DATA;
+	}
+	if (System::Convert::ToInt32(Value[25]) == 361) {
+		Console::WriteLine("Unexpected data length.");
 		return ERR_INVALID_DATA;
 	}
 	return SUCCESS;

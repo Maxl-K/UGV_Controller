@@ -3,7 +3,15 @@
 
 int GPS::connect(String^ hostName, int portNumber)
 {
-	
+	Client = gcnew TcpClient(Ip, PortNumber);
+	Client->NoDelay = true;
+	Client->ReceiveTimeout = 500;//ms
+	Client->SendTimeout = 500;//ms
+	Client->ReceiveBufferSize = 1024;
+	Client->SendBufferSize = 1024;
+
+	ReadData = gcnew array<unsigned char>(2500);
+	Stream = Client->GetStream();
 	return SUCCESS;
 }
 int GPS::setupSharedMemory()
@@ -28,16 +36,74 @@ int GPS::setupSharedMemory()
 }
 int GPS::getData()
 {
-	
+	SM_GPS GPSDATASTRUCT;
+	GPSDATAPtr = (&GPSDATASTRUCT);
+
+	if (Stream->DataAvailable) {
+
+		data_length = Stream->Read(ReadData, 0, ReadData->Length);
+		//BytePtr = (unsigned char*)(&GPSDATASTRUCT);
+		BytePtr = (unsigned char*)GPSData;
+		// ^^^
+		for (int i = 0; i < sizeof(SM_GPS); i++) {
+			*(BytePtr++) = ReadData[i];
+		}
+
+		if (GPSData == nullptr) {
+			Console::WriteLine("Nullptr");
+		}
+		if (BytePtr == nullptr) {
+			Console::WriteLine("Nullptr");
+		}
+		//std::cout << "CRC: " << GPSData->Checksum << std::endl;
+		//std::cout << "Northing: " << GPSData->Checksum << std::endl;
+		//std::cout << "Northing: " << GPSData->Northing << std::endl;
+		//std::cout << "Easting: " << GPSData->Easting << std::endl;
+
+		//std::cout << std::hex << "length: " << data_length << std::endl;
+
+		//std::cout << std::hex << "Expected CRC " << GPSData->Checksum << std::endl;
+
+		/*
+		if (GPSDATAPtr->Checksum == CalculateBlockCRC32(*data_length_ptr - 4, BytePtr) && *(BytePtr) == 0xAA) {
+			std::cout << "Northing: " << GPSDATAPtr->Northing << std::endl;
+			std::cout << "Easting: " << GPSDATAPtr->Easting << std::endl;
+			std::cout << "Height: " << GPSDATAPtr->Height << std::endl;
+			std::cout << "Calculated CRC: " << GPSDATAPtr->Checksum << std::endl;
+			Console::WriteLine();
+		}
+		else {
+			Console::WriteLine("Invalid Data");
+		}
+		*/
+	}
 	return SUCCESS;
 }
 int GPS::checkData()
 {
+	//if (GPSData->Checksum == CalculateBlockCRC32(data_length - 4, BytePtr) && *(BytePtr) == 0xAA) {
+	std::cout << "Calculated CRC: " << CalculateBlockCRC32(108, (unsigned char*)GPSData) << std::endl;
+	if (GPSData->Checksum != CalculateBlockCRC32(108, (unsigned char*)GPSData)) {
+		Console::WriteLine("Invalid Data");
+		return ERR_INVALID_DATA;
+	}
+	else if (*(unsigned char*)(GPSData) != 0xAA){
+		Console::WriteLine("Invalid Data");
+		return ERR_INVALID_DATA;
+	}
 	return SUCCESS;
 }
 int GPS::sendDataToSharedMemory()
 {
-	
+	std::cout << "Northing: " << GPSData->Northing << std::endl;
+	std::cout << "Easting: " << GPSData->Easting << std::endl;
+	std::cout << "Height: " << GPSData->Height << std::endl;
+	Console::WriteLine();
+
+	//GPSData->Northing = GPSDATAPtr->Northing;
+	//GPSData->Easting = GPSDATAPtr->Easting;
+	//GPSData->Height = GPSDATAPtr->Height;
+	//GPSData->Checksum = GPSDATAPtr->Checksum;
 	return SUCCESS;
 }
 bool GPS::getShutdownFlag()

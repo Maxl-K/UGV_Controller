@@ -17,10 +17,15 @@ int main()
 	Vehicle vehicle;
 	vehicle.setupSharedMemory();
 	Console::WriteLine("Process Awake");
+	vehicle.connect(vehicle.Ip, vehicle.PortNumber);
+
 	while (!vehicle.getShutdownFlag())
 	{
 		vehicle.setHeartbeat(MAX_WAIT_CYCLES);
-		vehicle.getData();
+		if (vehicle.checkData() == SUCCESS) {
+			vehicle.getData(); //Get (& send) data to SM
+		}
+
 		Thread::Sleep(25);
 	}
 

@@ -15,10 +15,14 @@ public:
 	bool getShutdownFlag() override;
 	int setHeartbeat(int maxWaitCycles) override;
 	~Vehicle();
+	int PortNumber = 25000;
+	System::String^ Ip = gcnew System::String("192.168.1.200");
 
 protected:
 	// YOUR CODE HERE (ADDITIONAL MEMBER VARIABLES THAT YOU MAY WANT TO ADD)
 	int WaitCounter = 0;
 	ProcessManagement* PMData = nullptr;
 	SM_VehicleControl* VehicleData = nullptr;
+	array<unsigned char>^ SendData;
+	System::String^ Message;
 };

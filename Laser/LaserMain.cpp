@@ -25,12 +25,10 @@ int main()
 	{
 		laser.setHeartbeat(MAX_WAIT_CYCLES);
 		laser.getData();
-		if (laser.checkData() != SUCCESS)
+		if (laser.checkData() == SUCCESS)
 		{
-			continue;
+			laser.sendDataToSharedMemory();
 		}
-		
-		laser.sendDataToSharedMemory();
 		Thread::Sleep(25);
 	}
 

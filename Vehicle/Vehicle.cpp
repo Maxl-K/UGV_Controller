@@ -3,8 +3,26 @@
 
 int Vehicle::connect(String^ hostName, int portNumber)
 {
-	// YOUR CODE HERE
-	return 1;
+	Client = gcnew TcpClient("192.168.1.200", PortNumber);
+	Client->NoDelay = true;
+	Client->ReceiveTimeout = 500;//ms
+	Client->SendTimeout = 500;//ms
+	Client->ReceiveBufferSize = 1024;
+	Client->SendBufferSize = 1024;
+
+	SendData = gcnew array<unsigned char>(16);
+	ReadData = gcnew array<unsigned char>(2500);
+
+	Stream = Client->GetStream();
+	System::Threading::Thread::Sleep(10);
+
+	System::String^ Zid = gcnew System::String("5265207\n");
+	array<unsigned char>^ SendZid = gcnew array<unsigned char>(16);
+	SendZid = System::Text::Encoding::ASCII->GetBytes(Zid);
+
+	Stream->Write(SendZid, 0, SendZid->Length);
+
+	return SUCCESS;
 }
 int Vehicle::setupSharedMemory()
 {
@@ -27,15 +45,29 @@ int Vehicle::setupSharedMemory()
 }
 int Vehicle::getData()
 {
-	double spd = VehicleData->Speed;
-	double str = VehicleData->Steering;
-	std::cout << "Speed: " << spd << " Steering: " << str << std::endl;
+	double speed = 0.0;
+	speed = VehicleData->Speed;
+	double steering = 0.0;
+	steering = VehicleData->Steering;
+	std::cout << "Speed: " << speed << " Steering: " << steering << std::endl;
+
+	int Vehicle_flag = PMData->Heartbeat.Flags.Vehicle;
+
+	Message = "# " + steering.ToString("F3") + " " + speed.ToString("F3") + " " + Vehicle_flag.ToString("D1");
+	Message = Message + " #";
+	//Console::WriteLine(Message);
+	//Console::WriteLine();
+	SendData = Encoding::ASCII->GetBytes(Message);
+	Stream->Write(SendData, 0, SendData->Length);
+
 	return SUCCESS;
 }
 int Vehicle::checkData()
 {
-	// YOUR CODE HERE
-	return 1;
+	if (VehicleData == NULL) {
+		return ERR_NO_DATA;
+	}
+	return SUCCESS;
 }
 int Vehicle::sendDataToSharedMemory()
 {

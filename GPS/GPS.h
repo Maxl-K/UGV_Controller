@@ -28,4 +28,7 @@ protected:
 	int WaitCounter = 0;
 	ProcessManagement* PMData = nullptr;
 	SM_GPS* GPSData = nullptr;
+	SM_GPS* GPSDATAPtr = nullptr;
+	unsigned long data_length;
+	unsigned char* BytePtr;
 };
