@@ -193,10 +193,16 @@ void display() {
 		glEnd();
 	}
 
-	// Display GPS Data?
+	SMObject GpsObj(_TEXT("GPSObj"), sizeof(SM_GPS));
+	while (GpsObj.SMAccess());
+	if (GpsObj.SMAccessError) {
+		Console::WriteLine("Shared memory access failed for GPS");
+	}
+	SM_GPS* GPSData = (SM_GPS*)GpsObj.pData;
 
 	// draw HUD
 	HUD::Draw();
+	HUD::PrintGPS(GPSData->Northing, GPSData->Easting, GPSData->Height);
 
 	glutSwapBuffers();
 };

@@ -49,13 +49,13 @@ int Vehicle::getData()
 	speed = VehicleData->Speed;
 	double steering = 0.0;
 	steering = VehicleData->Steering;
-	std::cout << "Speed: " << speed << " Steering: " << steering << std::endl;
+	//std::cout << "Speed: " << speed << " Steering: " << steering << std::endl;
 
-	int Vehicle_flag = PMData->Heartbeat.Flags.Vehicle;
+	Vehicle_flag = !Vehicle_flag;
 
 	Message = "# " + steering.ToString("F3") + " " + speed.ToString("F3") + " " + Vehicle_flag.ToString("D1");
 	Message = Message + " #";
-	//Console::WriteLine(Message);
+	Console::WriteLine(Message);
 	//Console::WriteLine();
 	SendData = Encoding::ASCII->GetBytes(Message);
 	Stream->Write(SendData, 0, SendData->Length);

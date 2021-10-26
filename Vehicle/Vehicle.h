@@ -25,4 +25,5 @@ protected:
 	SM_VehicleControl* VehicleData = nullptr;
 	array<unsigned char>^ SendData;
 	System::String^ Message;
+	int Vehicle_flag = 1;
 };

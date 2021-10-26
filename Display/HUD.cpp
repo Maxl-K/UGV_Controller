@@ -152,10 +152,23 @@ void HUD::Draw()
 		DrawGauge(600+winWidthOff, 280, 210, -40, 40, vehicle->getSteering(), "Steer");
 	}
 
-	//char buffer[16];
-	//double a = 3.1415;
-	//sprintf(buffer, "%.1f", a);
-	//RenderString(buffer, 0, 0, GLUT_BITMAP_HELVETICA_18);
+	Camera::get()->switchTo3DDrawing();
+}
 
+ void HUD::PrintGPS(float northing, float easting, float height) {
+	Camera::get()->switchTo2DDrawing();
+	// Display GPS Data?
+	char nbuff[80];
+	char ebuff[80];
+	char hbuff[80];
+	RenderString("Northing:", Camera::get()->getWindowWidth() / 2 - 280, 20, GLUT_BITMAP_HELVETICA_18);
+	sprintf(nbuff, "%.1f", northing);
+	RenderString(nbuff, Camera::get()->getWindowWidth() / 2 - 180, 20, GLUT_BITMAP_HELVETICA_18);
+	RenderString("Easting:", Camera::get()->getWindowWidth() / 2 - 80, 20, GLUT_BITMAP_HELVETICA_18);
+	sprintf(ebuff, "%.1f", easting);
+	RenderString(ebuff, Camera::get()->getWindowWidth() / 2 + 20, 20, GLUT_BITMAP_HELVETICA_18);
+	RenderString("Height:", Camera::get()->getWindowWidth() / 2 + 120, 20, GLUT_BITMAP_HELVETICA_18);
+	sprintf(hbuff, "%.1f", height);
+	RenderString(hbuff, Camera::get()->getWindowWidth() / 2 + 220, 20, GLUT_BITMAP_HELVETICA_18);
 	Camera::get()->switchTo3DDrawing();
 }
